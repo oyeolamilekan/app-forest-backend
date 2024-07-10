@@ -1,0 +1,11 @@
+development:
+  cloud_name: 'dbwm0ksoi'
+  api_key: '432267394814912'
+  api_secret: 'FeCNKoLAOIabuSROmo_uYPZqF4k'
+  secure: true
+
+production:
+  cloud_name: 'dbwm0ksoi'
+  api_key: '432267394814912'
+  api_secret: 'FeCNKoLAOIabuSROmo_uYPZqF4k'
+  secure: true

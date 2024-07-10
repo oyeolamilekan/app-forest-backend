@@ -1,0 +1,2 @@
+class AppFile < ApplicationRecord
+end
