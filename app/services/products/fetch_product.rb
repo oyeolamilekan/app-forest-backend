@@ -7,7 +7,9 @@ module Products
     end
 
     def call
-      product = Product.find_by(product_attribute)
+      product = Rails.cache.fetch("product/#{product_attribute[:slug]}", expires_in: 12.hours) do
+        Product.find_by(product_attribute)
+      end
       return [:error, "Product not found"] unless product
       return [:error, product.errors.full_messages] unless product.persisted?
 

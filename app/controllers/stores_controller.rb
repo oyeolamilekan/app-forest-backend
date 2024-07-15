@@ -4,7 +4,8 @@ class StoresController < ApplicationController
   ]
 
   def create_store
-    store_param = store_params.merge(user: current_user)
+    status_file, upload_file = AppFiles::Upload.call(file: params[:file])
+    store_param = store_params.merge(user: current_user, logo_url: upload_file["secure_url"])
     status, result = Stores::CreateStore.call(store_attributes: store_param)
     return api_response(status: true, message: "Successfully created store", data: result, status_code: :created) if status == :success
     api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity)

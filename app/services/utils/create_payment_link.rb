@@ -1,18 +1,20 @@
 module Utils
   class CreatePaymentLink < ApplicationService
-    attr_reader :price_cents, :api_key, :product_name, :product_id
+    attr_reader :price_cents, :api_key, :product_name, :product_id, :store_slug
 
-    def initialize(price_cents:, api_key:, product_name:, product_id:)
+    def initialize(price_cents:, api_key:, product_name:, product_id:, store_slug:)
       @price_cents = price_cents
       @api_key = api_key
       @product_name = product_name
       @product_id = product_id
+      @store_slug = store_slug
     end
 
     def call
       Stripe.api_key = api_key
 
       begin
+        base_frontend_url = ENV['BASE_FRONTEND_URL']
         session = Stripe::Checkout::Session.create({
           payment_method_types: ['card'],
           line_items: [{
@@ -24,8 +26,8 @@ module Utils
             quantity: 1, # Single item purchase
           }],
           mode: 'payment',
-          success_url: 'https://website.com/' + 'success?session_id={CHECKOUT_SESSION_ID}',
-          cancel_url: 'https://website.com/' + 'cancel',
+          success_url: base_frontend_url + 'success?session_id={CHECKOUT_SESSION_ID}',
+          cancel_url: base_frontend_url + 'cancel',
           custom_fields: [
             {
               key: 'githubusername',

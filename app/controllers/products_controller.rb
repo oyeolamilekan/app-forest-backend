@@ -1,7 +1,8 @@
 class ProductsController < ApplicationController
   before_action :authorize_request, except: [
     :fetch_products,
-    :fetch_product
+    :fetch_product,
+    :create_payment_link
   ]
 
   def create_product
@@ -32,6 +33,20 @@ class ProductsController < ApplicationController
     api_response(status: true, message: "Products successfully retrieved", data: result)
   end
 
+  def create_payment_link
+    status_product, result_product = Products::FetchProduct.call(product_attribute: { slug: product_slug }) if product_slug.present?
+    return api_response(status: false, message: result_product, data: nil, status_code: :not_found) if status_product == :error
+    status_integration, result_integration = Integrations::FetchIntegration.call(store_slug: result_product.store.slug, provider_id: 'stripe')
+    return api_response(status: false, message: result_integration, data: nil, status_code: :not_found) if status_integration == :error
+    status_payment_link, result_payment_link = Utils::CreatePaymentLink.call(
+      price_cents: (result_product.price * 100).to_i, 
+      api_key: result_integration.key, 
+      product_name: result_product.name, 
+      product_id: result_product.public_id
+    )
+    api_response(status: status_payment_link, message: "Payment link successfully created", data: { link: result_payment_link}, status_code: :created)
+  end
+
   def update_product
     status, result = Stores::FetchStore.call(slug: store_slug) if store_slug.present?
     return api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity) if status == :error
@@ -40,6 +55,12 @@ class ProductsController < ApplicationController
     status, result = Products::UpdateProduct.call(product_slug: product_slug, product_params: product_params, user: current_user)
     return api_response(status: true, message: "Successfully update product", data: result, status_code: :created) if status == :success
     api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity)
+  end
+
+  def delete_product
+    status, result = Products::DeleteProduct.call(product_attribute: { slug: product_slug }, user: current_user)
+    return api_response(status: true, message: "Products cannot be deleted", data: nil, status_code: :internal_server_error) if status == :error
+    api_response(status: true, message: "Products successfully deleted", data: nil, status_code: :no_content)
   end
 
   private

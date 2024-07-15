@@ -26,7 +26,9 @@ Rails.application.routes.draw do
       get '/fetch_product_count/:store_slug', to: 'products#fetch_product_count'
       get '/fetch_products/:store_slug', to: 'products#fetch_products'
       get '/fetch_product/:product_slug', to: 'products#fetch_product'
+      delete '/delete_product/:product_slug', to: 'products#delete_product'
       put '/update_product/:store_slug/:product_slug', to: 'products#update_product'
+      post '/create_payment_link/:product_slug', to: 'products#create_payment_link'
     end
 
     scope '/merchants' do

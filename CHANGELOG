@@ -1,0 +1,6 @@
+🏗️ Built frontend for storefront
+🔍 Added dynamic SEO to store pages
+⚡ Implemented caching for backend components to improve performance
+🔒 Disabled dashboard links for empty stores to enhance user experience
+🎨 Added logo to storefront header for brand visibility
+👤 Implemented background job to add user after successful purchase

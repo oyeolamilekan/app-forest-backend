@@ -24,10 +24,7 @@ class WebhooksController < ApplicationController
     when 'checkout.session.completed'
       github_username = event.data.object.custom_fields.find { |obj| obj.key = 'githubusername' }.text.value
       product_id = event.data.object.metadata.product_id
-      status, product_obj = Products::FetchProduct.call(product_attribute: { public_id: product_id })
-      status, repo_name = Utils::RepoLink.shorten(product_obj.repo_link)
-      status, github_obj = Integrations::FetchIntegration.call(store_slug: store_slug, provider_id: "github")
-      status, add_user = Utils::AddUserToRepo.call(repo: repo_name, username: github_username, permission: "pull", access_token: github_obj.key)      
+      ProcessFundJob.perform_later(github_username: github_username, product_id: product_id, store_slug: store_slug)
     end
     api_response(status: true, message: "Stripe checkout has worked", data: nil, status_code: :created)
   end
