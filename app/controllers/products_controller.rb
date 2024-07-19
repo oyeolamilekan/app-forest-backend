@@ -42,9 +42,11 @@ class ProductsController < ApplicationController
       price_cents: (result_product.price * 100).to_i, 
       api_key: result_integration.key, 
       product_name: result_product.name, 
-      product_id: result_product.public_id
+      product_id: result_product.public_id,
+      store_slug: result_product.store.slug
     )
-    api_response(status: status_payment_link, message: "Payment link successfully created", data: { link: result_payment_link}, status_code: :created)
+    return api_response(status: false, message: result_payment_link, data: nil, status_code: :internal_server_error) if status_payment_link == :error
+    api_response(status: true, message: "Payment link successfully created", data: { link: result_payment_link }, status_code: :created)
   end
 
   def update_product

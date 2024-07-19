@@ -14,7 +14,7 @@ module Utils
       Stripe.api_key = api_key
 
       begin
-        base_frontend_url = ENV['BASE_FRONTEND_URL']
+        base_frontend_url = ENV.fetch('BASE_FRONTEND_URL', 'https://website.com')
         session = Stripe::Checkout::Session.create({
           payment_method_types: ['card'],
           line_items: [{
