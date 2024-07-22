@@ -15,6 +15,7 @@ module Utils
 
       begin
         base_frontend_url = ENV.fetch('BASE_FRONTEND_URL', 'https://website.com')
+        complete_url = Utils::SharedFunctions.add_subdomain(base_frontend_url, store_slug)
         session = Stripe::Checkout::Session.create({
           payment_method_types: ['card'],
           line_items: [{
@@ -26,8 +27,8 @@ module Utils
             quantity: 1, # Single item purchase
           }],
           mode: 'payment',
-          success_url: base_frontend_url + 'success?session_id={CHECKOUT_SESSION_ID}',
-          cancel_url: base_frontend_url + 'cancel',
+          success_url: complete_url + 'success?session_id={CHECKOUT_SESSION_ID}',
+          cancel_url: complete_url + 'cancel',
           custom_fields: [
             {
               key: 'githubusername',
