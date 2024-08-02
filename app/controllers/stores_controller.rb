@@ -23,7 +23,7 @@ class StoresController < ApplicationController
   end
 
   def update_store
-    status, result = Stores::UpdateStore.call(user: current_user, store_slug: store_slug, store_params: store_params)
+    status, result = Stores::UpdateStore.call(user: current_user, public_id: public_id, store_params: store_params)
     return api_response(status: true, message: "Successfully fetched store", data: result, status_code: :created) if status == :success
     api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity)
   end
@@ -35,5 +35,9 @@ class StoresController < ApplicationController
 
   def store_slug
     params.require(:store_slug)
+  end
+
+  def public_id
+    params.require(:public_id)
   end
 end

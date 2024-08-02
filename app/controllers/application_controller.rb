@@ -28,6 +28,10 @@ class ApplicationController < ActionController::API
     return render json: response, status: status_code || :ok
   end
 
+  def api_error(status_code: nil, message:)
+    api_response(status: false, message: message, data: nil, status_code: :status_code)  
+  end
+
   def render_error_response(exception)
 
     Rails.logger.error("An exception occurred: #{exception.message}")

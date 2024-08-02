@@ -1,14 +1,14 @@
 module Stores
   class FetchStore < ApplicationService
-    attr_reader :slug
+    attr_reader :store_attributes
 
-    def initialize(slug:)
-      @slug = slug
+    def initialize(store_attributes:)
+      @store_attributes = store_attributes
     end
 
     def call
-      store = Rails.cache.fetch("store/#{slug}", expires_in: 12.hours) do
-        Store.find_by(slug: slug)
+      store = Rails.cache.fetch("store/#{store_attributes[:slug] || store_attributes[:public_id]}", expires_in: 5.minutes) do
+        Store.find_by(store_attributes)
       end
       return [:success, store] if store.present?
       return [:error, "Cannot find store."]

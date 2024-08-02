@@ -6,9 +6,9 @@ class ProductsController < ApplicationController
   ]
 
   def create_product
-    image_urls = extract_image_urls(params[:files])
-    status, upload_file = AppFiles::Upload.call(file: params[:file])
-    status, result = Stores::FetchStore.call(slug: store_slug) if store_slug.present?
+    image_urls = extract_image_urls(files)
+    status, upload_file = AppFiles::Upload.call(file: file)
+    status, result = Stores::FetchStore.call(store_attributes: { slug: store_slug }) if store_slug.present?
     return api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity) if status == :error
     return api_response(status: false, message: "You can't create product for a store your don't own", data: nil, status_code: :unprocessable_entity) unless result.user == current_user
     product_param = product_params.merge(store_id: result.id, image_url: upload_file["secure_url"], gallery_imaages: image_urls)
@@ -33,11 +33,18 @@ class ProductsController < ApplicationController
     api_response(status: true, message: "Products successfully retrieved", data: result)
   end
 
+  def fetch_product_by_public_id
+    status, result = Products::FetchProduct.call(product_attribute: { public_id: public_id }) if public_id.present?
+    return api_response(status: false, message: result, data: nil, status_code: :not_found) if status == :error
+    data = result.as_json.merge(repo_link: result.repo_link)
+    api_response(status: true, message: "Products successfully retrieved", data: data)
+  end
+
   def create_payment_link
     status_product, result_product = Products::FetchProduct.call(product_attribute: { slug: product_slug }) if product_slug.present?
-    return api_response(status: false, message: result_product, data: nil, status_code: :not_found) if status_product == :error
+    return api_error(message: result_integration, status_code: :not_found) if status_product == :error
     status_integration, result_integration = Integrations::FetchIntegration.call(store_slug: result_product.store.slug, provider_id: 'stripe')
-    return api_response(status: false, message: result_integration, data: nil, status_code: :not_found) if status_integration == :error
+    return api_error(message: result_integration, status_code: :not_found) if status_integration == :error
     status_payment_link, result_payment_link = Utils::CreatePaymentLink.call(
       price_cents: (result_product.price * 100).to_i, 
       api_key: result_integration.key, 
@@ -50,24 +57,66 @@ class ProductsController < ApplicationController
   end
 
   def update_product
-    status, result = Stores::FetchStore.call(slug: store_slug) if store_slug.present?
+    status, result = Stores::FetchStore.call(store_attributes: { slug: store_slug }) if store_slug.present?
     return api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity) if status == :error
     return api_response(status: false, message: "You can't update product for a store your don't own", data: nil, status_code: :unprocessable_entity) unless result.user == current_user
     product_param = product_params.merge(store_id: result.id)
-    status, result = Products::UpdateProduct.call(product_slug: product_slug, product_params: product_params, user: current_user)
+    status, result = Products::UpdateProduct.call(public_id: public_id, product_params: product_params, user: current_user)
     return api_response(status: true, message: "Successfully update product", data: result, status_code: :created) if status == :success
     api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity)
   end
 
   def delete_product
     status, result = Products::DeleteProduct.call(product_attribute: { slug: product_slug }, user: current_user)
-    return api_response(status: true, message: "Products cannot be deleted", data: nil, status_code: :internal_server_error) if status == :error
+    return api_error(message: "Products cannot be deleted", status_code: :internal_server_error) if status == :error
     api_response(status: true, message: "Products successfully deleted", data: nil, status_code: :no_content)
   end
 
+  def delete_image
+    status, result = Products::FetchProduct.call(product_attribute: { public_id: public_id }) if public_id.present?
+    if result.gallery_imaages.delete(image_url)
+      result.save ? api_response(status: true, message: "Image successfully deleted", data: nil, status_code: :no_content) : api_error(message: "Cannot delete image", status_code: :not_found)
+    end
+  end
+
+  def add_image
+    image_urls = extract_image_urls(files)
+    status, result = Products::FetchProduct.call(product_attribute: { public_id: public_id }) if public_id.present?
+    result.gallery_imaages.push(*image_urls)
+    result.save ? api_response(status: true, message: "Image successfully added", data: nil, status_code: :no_content) : api_error(message: "Cannot add image", status_code: :not_found)
+  end
+
+  def change_product_logo
+    status, result = Products::FetchProduct.call(product_attribute: { public_id: public_id }) if public_id.present?
+    status, upload_file = AppFiles::Upload.call(file: file)
+    result.update(image_url: upload_file["secure_url"]) ? api_response(status: true, message: "Image successfully change", data: nil, status_code: :no_content) : api_error(message: "Cannot add image", status_code: :not_found)
+  end
+
+  def change_store_logo
+    status, result = Stores::FetchStore.call(store_attributes: { public_id: public_id }) if public_id.present?
+    status, upload_file = AppFiles::Upload.call(file: file)
+    result.update(logo_url: upload_file["secure_url"]) ? api_response(status: true, message: "Image successfully change", data: result, status_code: :ok) : api_error(message: "Cannot add image", status_code: :not_found)
+  end
+
   private
+  def files
+    params.require(:files)
+  end
+
+  def file
+    params.require(:file)
+  end
+
   def product_params
     params.permit(:name, :description, :repo_link, :price)
+  end
+
+  def image_url
+    params.require(:image_url)
+  end
+
+  def public_id
+    params.require(:public_id)
   end
 
   def store_slug
