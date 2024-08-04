@@ -7,7 +7,7 @@ module Stores
     end
 
     def call
-      store = Rails.cache.fetch("store/#{store_attributes[:slug] || store_attributes[:public_id]}", expires_in: 5.minutes) do
+      store = Rails.cache.fetch("store/#{store_attributes.keys.first}/#{store_attributes.values.first}", expires_in: 5.minutes) do
         Store.find_by(store_attributes)
       end
       return [:success, store] if store.present?

@@ -2,6 +2,8 @@ class Store < ApplicationRecord
   include HasPublicId
   include Slugify
 
+  ATTRIBUTES = [:public_id, :id, :slug].freeze
+
   belongs_to :user
   has_one :payment_api_key, dependent: :destroy
   has_many :integration
@@ -23,6 +25,8 @@ class Store < ApplicationRecord
   end
 
   def expire_cache
-    Rails.cache.delete("product/#{slug}")
+    ATTRIBUTES.each do |attribute|
+      Rails.cache.delete("store/#{attribute}/#{self.send(attribute)}")
+    end
   end
 end
