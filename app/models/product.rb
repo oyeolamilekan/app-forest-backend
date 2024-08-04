@@ -16,7 +16,7 @@ class Product < ApplicationRecord
 
   def expire_cache
     ATTRIBUTES.each do |attribute|
-      Rails.cache.delete("product/#{self.send(attribute)}")
+      Rails.cache.delete("product/#{attribute}/#{self.send(attribute)}")
     end
   end
 end
