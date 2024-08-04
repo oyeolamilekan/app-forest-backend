@@ -12,7 +12,7 @@ class StoresController < ApplicationController
   end
 
   def fetch_store
-    status, result = Stores::FetchStore.call(slug: store_slug)
+    status, result = Stores::FetchStore.call(store_attributes: { slug: store_slug })
     return api_response(status: true, message: "Stores successfully retrieved", data: result) if status == :success
     api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity)
   end

@@ -7,7 +7,7 @@ class IntegrationsController < ApplicationController
   end
 
   def create_integration
-    status, result = Stores::FetchStore.call(slug: store_slug) if store_slug.present?
+    status, result = Stores::FetchStore.call(store_attributes: { slug: store_slug }) if store_slug.present?
     return api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity) if status == :error
     return api_response(status: false, message: "You can't create integration for a store your don't own", data: nil, status_code: :unprocessable_entity) unless result.user == current_user
     integration_param = integration_params.merge(store_id: result.id)
@@ -17,7 +17,7 @@ class IntegrationsController < ApplicationController
   end
 
   def update_integration
-    status, result = Stores::FetchStore.call(slug: store_slug) if store_slug.present?
+    status, result = Stores::FetchStore.call(store_attributes: { slug: store_slug }) if store_slug.present?
     return api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity) if status == :error
     return api_response(status: false, message: "You can't update integration for a store your don't own", data: nil, status_code: :unprocessable_entity) unless result.user == current_user
     integration_param = integration_params.merge(store_id: result.id)
@@ -27,7 +27,7 @@ class IntegrationsController < ApplicationController
   end
 
   def delete_integration
-    status, result = Stores::FetchStore.call(slug: store_slug) if store_slug.present?
+    status, result = Stores::FetchStore.call(store_attributes: { slug: store_slug }) if store_slug.present?
     return api_response(status: false, message: result, data: nil, status_code: :unprocessable_entity) if status == :error
     return api_response(status: false, message: "You can't create integration for a store your don't own", data: nil, status_code: :unprocessable_entity) unless result.user == current_user
     status, result = Integrations::DeleteIntegration.call(integration_public_id: integration_public_id, current_user: current_user)
