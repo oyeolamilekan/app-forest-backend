@@ -7,7 +7,7 @@ module Products
     end
 
     def call
-      product = Rails.cache.fetch("product/#{product_attribute[:public_id]}", expires_in: 12.hours) do
+      product = Rails.cache.fetch("product/#{product_attribute.keys.first}", expires_in: 12.hours) do
         Product.find_by(product_attribute)
       end
       return [:error, "Product not found"] unless product

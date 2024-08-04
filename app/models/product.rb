@@ -2,6 +2,8 @@ class Product < ApplicationRecord
   include Slugify
   include HasPublicId
 
+  ATTRIBUTES = [:public_id, :id, :slug].freeze
+
   after_commit :expire_cache, on: [:destroy, :update]
 
   validates_presence_of :name, :description, :price, :repo_link, :image_url
@@ -13,6 +15,8 @@ class Product < ApplicationRecord
   end
 
   def expire_cache
-    Rails.cache.delete("product/#{public_id}")
+    ATTRIBUTES.each do |attribute|
+      Rails.cache.delete("product/#{self.send(attribute)}")
+    end
   end
 end
