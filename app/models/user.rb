@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :bigint           not null, primary key
+#  email           :text
+#  first_name      :string
+#  last_name       :text
+#  password        :text
+#  password_digest :text
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  public_id       :text
+#
 class User < ApplicationRecord
   include HasPublicId
 
@@ -8,6 +22,8 @@ class User < ApplicationRecord
   validates :email, format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i }
   before_save :lowercase
   has_many :stores, class_name: "store", foreign_key: "user_id"
+  after_create :send_user_welcome_mail
+  after_update :expire_cache
 
   def as_json(options = {})
     super(options.merge({ except: [:id, :password, :password_digest], methods: [:token] }))
@@ -21,5 +37,13 @@ class User < ApplicationRecord
   def token
     status, payload = Users::EncodeJsonWebToken.call(payload: {user_id: self.id})
     return payload if status == :success
+  end
+
+  def send_user_welcome_mail
+    UserMailer.welcome_email(self).deliver_later
+  end
+
+  def expire_cache
+    Rails.cache.delete("user/#{self.id}")
   end
 end

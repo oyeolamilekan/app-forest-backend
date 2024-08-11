@@ -1,16 +1,11 @@
 # == Schema Information
 #
-# Table name: products
+# Table name: customers
 #
 #  id              :bigint           not null, primary key
-#  description     :text
-#  gallery_imaages :text             default([]), is an Array
-#  image_url       :string
+#  email           :string
+#  github_username :string
 #  name            :string
-#  price           :decimal(, )
-#  repo_link       :string
-#  slug            :string
-#  url             :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  public_id       :string
@@ -18,7 +13,7 @@
 #
 # Indexes
 #
-#  index_products_on_store_id  (store_id)
+#  index_customers_on_store_id  (store_id)
 #
 # Foreign Keys
 #
@@ -26,7 +21,7 @@
 #
 require "test_helper"
 
-class ProductTest < ActiveSupport::TestCase
+class CustomerTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

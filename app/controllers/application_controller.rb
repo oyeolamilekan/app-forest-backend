@@ -8,7 +8,9 @@ class ApplicationController < ActionController::API
     header = header.split(' ').last if header
     begin
       @decoded = Users::DecodeJsonWebToken.call(token: header)
-      @current_user = User.find(@decoded[:user_id])
+      @current_user = Rails.cache.fetch("user/#{@decoded[:user_id]}") do 
+        User.find(@decoded[:user_id])
+      end
     rescue ActiveRecord::RecordNotFound => e
       render json: { status: false, message: "Invalid token", data: nil }, status: :unauthorized
     rescue JWT::DecodeError => e
@@ -29,7 +31,7 @@ class ApplicationController < ActionController::API
   end
 
   def api_error(status_code: nil, message:)
-    api_response(status: false, message: message, data: nil, status_code: :status_code)  
+    api_response(status: false, message: message, data: nil, status_code: status_code)  
   end
 
   def render_error_response(exception)

@@ -42,9 +42,11 @@ module Utils
         })
         [:success, session.url]
       rescue Stripe::StripeError => e
-        [:error, "Stripe error: #{e.message}"]
+        Rails.logger.error("Stripe::StripeError payment failed: #{e.message}")
+        [:error, "Error in creating payment link"]
       rescue => e
-        [:error, "Error creating payment link: #{e.message}"]
+        Rails.logger.error("Stripe Error payment failed: #{e.message}")
+        [:error, "Error in creating payment link"]
       ensure
         Stripe.api_key = nil  # Reset the API key after use
       end

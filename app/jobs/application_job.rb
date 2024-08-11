@@ -1,7 +1,22 @@
 class ApplicationJob < ActiveJob::Base
-  # Automatically retry jobs that encountered a deadlock
-  # retry_on ActiveRecord::Deadlocked
+  before_enqueue do |job|
+    logger.info "About to enqueue job #{job.class.name} (#{job.job_id}) to queue '#{job.queue_name}'"
+  end
 
-  # Most jobs are safe to ignore if the underlying records are no longer available
-  # discard_on ActiveJob::DeserializationError
+  after_enqueue do |job|
+    logger.info "Successfully enqueued job #{job.class.name} (#{job.job_id}) to queue '#{job.queue_name}'"
+  end
+
+  around_perform :log_perform
+
+  private
+
+  def log_perform
+    logger.info "Starting to perform job #{self.class.name} (#{job_id})"
+    start_time = Time.current
+    yield
+    end_time = Time.current
+    duration = (end_time - start_time).round(2)
+    logger.info "Finished performing job #{self.class.name} (#{job_id}) in #{duration} seconds"
+  end
 end

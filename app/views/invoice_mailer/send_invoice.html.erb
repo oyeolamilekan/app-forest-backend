@@ -1,0 +1,29 @@
+<!-- app/views/invoice_mailer/send_invoice.html.erb -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>Invoice for Your Recent Purchase</h1>
+    <p>
+      Dear <%= @user.name %>,
+    </p>
+    <p>
+      Thank you for your recent purchase. Please find attached the invoice for your order.
+    </p>
+    <p>
+      Invoice Details:
+      <br>
+      Invoice Id: <%= @invoice.public_id %>
+      <br>
+      Date: <%= @invoice.created_at.strftime('%B %d, %Y') %>
+      <br>
+      Total Amount: <%= number_to_currency(@invoice.total / 100) %>
+    </p>
+    <p>
+      If you have any questions about this invoice, please don't hesitate to contact us.
+    </p>
+    <p>Thank you for your business!</p>
+  </body>
+</html>

@@ -23,6 +23,9 @@ gem "redis", "~> 4.0"
 gem "redis-rails"
 
 gem "sidekiq"
+gem "sib-api-v3-sdk"
+gem "prawn"
+gem "colorize"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
@@ -44,6 +47,9 @@ gem "jwt"
 
 gem "octokit"
 
+gem 'prawn'
+gem 'prawn-table'
+gem 'open-uri'
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
@@ -56,6 +62,8 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
   gem 'solargraph'
   gem 'pry-rails'
+  gem 'letter_opener'
+  gem 'annotate'
 end
 
 group :development do
