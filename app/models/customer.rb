@@ -21,5 +21,5 @@
 #
 class Customer < ApplicationRecord
   include HasPublicId
-  has_many :invoices
+  has_many :invoice
 end

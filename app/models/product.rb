@@ -34,6 +34,7 @@ class Product < ApplicationRecord
 
   validates_presence_of :name, :description, :price, :repo_link, :image_url
   belongs_to :store
+  has_many :invoice
   default_scope { order(created_at: :desc) }
 
   def as_json(options = {})

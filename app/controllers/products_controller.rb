@@ -24,7 +24,7 @@ class ProductsController < ApplicationController
 
   def fetch_products
     status, result = Products::FetchProducts.call(store_slug: store_slug, page: params[:page])
-    api_response(status: true, message: "Products successfully retrieved", data: result.to_a, meta: result.pagination_meta)
+    api_response(status: true, message: "Products successfully retrieved", data: result, meta: result.pagination_meta)
   end
 
   def fetch_product

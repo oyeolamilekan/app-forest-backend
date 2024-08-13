@@ -13,6 +13,10 @@ Rails.application.routes.draw do
       put '/update_store/:public_id', to: 'stores#update_store'
     end
 
+    scope '/orders' do
+      get '/invoices', to: 'invoices#fetch_invoices'
+    end
+
     scope '/integrations' do
       get '/fetch_integration_count/:store_slug', to: 'integrations#fetch_integration_count'
       post '/create_integration/:store_slug', to: 'integrations#create_integration'

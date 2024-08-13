@@ -39,7 +39,7 @@ class Store < ApplicationRecord
   after_commit :expire_cache
 
   def as_json(options = {})
-    super(options.merge({ except: [:id, :user_id] }))
+    super(options.merge({ except: [:user_id] }))
   end
 
   def is_owner
