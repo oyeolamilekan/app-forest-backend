@@ -3,7 +3,7 @@ class WebhooksController < ApplicationController
 
   def stripe
     event = verify_stripe_webhook
-    return api_response(status: false, message: "Invalid payload or signature", status_code: :bad_request) unless event
+    return api_error(message: "Invalid payload or signature", status_code: :bad_request) unless event
 
     if event.type == 'checkout.session.completed'
       process_checkout_session(event.data.object)
