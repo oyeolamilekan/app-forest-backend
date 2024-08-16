@@ -29,6 +29,10 @@ class User < ApplicationRecord
     super(options.merge({ except: [:id, :password, :password_digest], methods: [:token] }))
   end
 
+  def update_password(password)
+    self.update!(password: password)
+  end
+
   def lowercase
     self.first_name = first_name.downcase
     self.last_name = last_name.downcase
