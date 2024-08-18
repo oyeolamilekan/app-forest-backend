@@ -5,6 +5,7 @@ class InvoicesController < ApplicationController
   def fetch_invoices
     status, result = Invoices::FetchInvoices.new(
       store_id: params[:store_id],
+      customer_id: params[:customer_id],
       page: params[:page],
       per_page: params[:per_page]
     ).call
