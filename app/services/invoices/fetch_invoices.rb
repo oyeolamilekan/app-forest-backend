@@ -26,11 +26,6 @@ module Invoices
       base_query = Invoice.order(created_at: :desc)
 
       invoices = store_id ? base_query.where(store_id: store_id) : base_query.where(customer_id: customer_id)
-
-      # Eager load associations only if needed
-      invoices = invoices.includes(:store) if store_id
-      invoices = invoices.includes(:customer) if customer_id
-
       invoices.page(page).per(per_page)
     end
   end
