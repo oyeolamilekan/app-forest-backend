@@ -39,6 +39,7 @@ class Invoice < ApplicationRecord
 
   def as_json(options = {})
     super(options.merge(
+      include: { customer: { except: [:id] } },
       except: [:customer_id, :store_id, :product_id, :id]
     ))
   end
