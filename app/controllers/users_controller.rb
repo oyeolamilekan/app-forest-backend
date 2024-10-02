@@ -6,14 +6,14 @@ class UsersController < ApplicationController
 
   def sign_up
     status, user = Users::CreateUser.call(user_params: create_user_params)
+    is_email_disposable = Utils::EmailCheckerService.call(params[:email])
+    return api_error(message: "Error in authenticating user, kindly check your credentials", status_code: :unprocessable_entity) if is_email_disposable
     return api_response(status: true, message: "Successfully created user", data: nil, status_code: :created) if status == :success
     api_error(message: user, status_code: :unprocessable_entity)
   end
 
   def login
     status, user = Users::GetUser.call(user_attribute: { email: params[:email] })
-    is_email_disposable = Utils::EmailCheckerService.call(params[:email])
-    return api_error(message: "Error in authenticating user, kindly check your credentials", status_code: :unprocessable_entity) if is_email_disposable
     if user && user.authenticate(params[:password])
       api_response(status: true, message: "Successfully Logged in", data: user.as_json, status_code: :ok)
     else
