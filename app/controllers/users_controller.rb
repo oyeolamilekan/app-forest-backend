@@ -12,7 +12,8 @@ class UsersController < ApplicationController
 
   def login
     status, user = Users::GetUser.call(user_attribute: { email: params[:email] })
-    if user && user.authenticate(params[:password])
+    is_email_disposable = Utils::EmailCheckerService.call(params[:email])
+    if user && user.authenticate(params[:password]) && !is_email_disposable
       api_response(status: true, message: "Successfully Logged in", data: user.as_json, status_code: :ok)
     else
       api_error(message: "Error in authenticating user, kindly check your credentials", status_code: :unprocessable_entity)
