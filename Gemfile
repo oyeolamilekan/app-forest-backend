@@ -26,6 +26,7 @@ gem "sidekiq"
 gem "sib-api-v3-sdk"
 gem "prawn"
 gem "colorize"
+gem 'httparty'
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
@@ -47,7 +48,6 @@ gem "jwt"
 
 gem "octokit"
 
-gem 'prawn'
 gem 'prawn-table'
 gem 'open-uri'
 
